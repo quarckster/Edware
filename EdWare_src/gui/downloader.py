@@ -27,6 +27,7 @@ import os.path
 import datetime
 import wx.lib.filebrowsebutton as fbb
 import string
+import threading
 
 import wx
 import device_data
@@ -450,14 +451,17 @@ class audio_downloader(wx.Dialog):
         WAV_FILE = os.path.join(paths.get_store_dir(), "program.wav")
 
         if USE_WAVER:
-            startupinfo = subprocess.STARTUPINFO()
-            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            logfile = open("waver.log", "w")
-            waver_path = os.path.join(paths.get_run_dir(), "waver", "waver.exe")
-            process = subprocess.Popen([waver_path, WAV_FILE], startupinfo=startupinfo, stdout=logfile)
+            waver = threading.Thread(target=run_waver, args=(WAV_FILE,))
+            waver.start()
             self.gauge.SetLabel("")
-            process.wait()
-            logfile.close()
+            # startupinfo = subprocess.STARTUPINFO()
+            # startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            # logfile = open("waver.log", "w")
+            # waver_path = os.path.join(paths.get_run_dir(), "waver", "waver.exe")
+            # process = subprocess.Popen([waver_path, WAV_FILE], startupinfo=startupinfo, stdout=logfile)
+            # self.gauge.SetLabel("")
+            # process.wait()
+            # logfile.close()
 
         elif USE_PORTAUDIO:
             wf = wave.open(WAV_FILE, 'rb')
@@ -540,7 +544,7 @@ class audio_downloader(wx.Dialog):
         self.Refresh()
         
         # --------------- AUDIO FIRMWARE dialog ----------------------------------
-        
+    
 class audio_firmware_downloader(wx.Dialog):
     def __init__(self, file_name, title="Set Title!"):
         wx.Dialog.__init__(self, None, -1, title)
@@ -632,14 +636,17 @@ class audio_firmware_downloader(wx.Dialog):
 
         time.sleep(1)
         if USE_WAVER:
-            startupinfo = subprocess.STARTUPINFO()
-            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            logfile = open("waver.log", "w")
-            waver_path = os.path.join(paths.get_run_dir(), "waver", "waver.exe")
-            process = subprocess.Popen([waver_path, "firmware.wav"], startupinfo=startupinfo, stdout=logfile)
+            waver = threading.Thread(target=run_waver, args=("firmware.wav",))
+            waver.start()
             self.gauge.SetLabel("")
-            process.wait()
-            logfile.close()
+            # startupinfo = subprocess.STARTUPINFO()
+            # startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            # logfile = open("waver.log", "w")
+            # waver_path = os.path.join(paths.get_run_dir(), "waver", "waver.exe")
+            # process = subprocess.Popen([waver_path, "firmware.wav"], startupinfo=startupinfo, stdout=logfile)
+            # self.gauge.SetLabel("")
+            # process.wait()
+            # logfile.close()
 
         elif USE_PORTAUDIO:
             wf = wave.open("firmware.wav", 'rb')
@@ -1317,4 +1324,12 @@ def createAudio(midQuantas):
 
     return data
         
-            
+def run_waver(wav_file):
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    logfile = open("waver.log", "w")
+    waver_path = os.path.join(paths.get_run_dir(), "waver", "waver.exe")
+    process = subprocess.Popen([waver_path, wav_file], startupinfo=startupinfo, stdout=logfile)
+    process.wait()
+    logfile.close()
+
