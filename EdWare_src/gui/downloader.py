@@ -378,8 +378,12 @@ class audio_downloader(wx.Dialog):
         #print self.GetBackgroundColour()
 
         self.progress_prompt = wx.StaticText(self, -1, "Download progress:")
-        self.gauge = wx.StaticText(self, -1, "")
-            
+        if any([USE_WINSOUND, USE_WAVER]):
+            self.gauge = wx.StaticText(self, -1, "")
+        else:
+            self.gauge = wx.Gauge(self, -1, range=100)
+            self.gauge.SetMinSize((500, -1))
+
         self.start = wx.Button(self, -1, "Start Download")
         self.cancel = wx.Button(self, -1, "Cancel Download")
         self.help_text = wx.StaticText(self, -1, "")
@@ -429,7 +433,11 @@ class audio_downloader(wx.Dialog):
         self.cancel.Disable()
         self.help_text.SetLabel("Downloading %d bytes." % (self.byte_count,))
 
-        self.gauge.SetLabel("...DOWNLOADING...")
+        if any([USE_WINSOUND, USE_WAVER]):
+            self.gauge.SetLabel("...DOWNLOADING...")
+        else:
+            self.gauge.SetValue(0)
+            self.gauge.Update()
             
         self.Update()
 
@@ -525,7 +533,11 @@ class audio_firmware_downloader(wx.Dialog):
             self.SetBackgroundColour("light grey")
 
         self.progress_prompt = wx.StaticText(self, -1, "Download progress:")
-        self.gauge = wx.StaticText(self, -1, "")
+        if any([USE_WINSOUND, USE_WAVER]):
+            self.gauge = wx.StaticText(self, -1, "")
+        else:
+            self.gauge = wx.Gauge(self, -1, range=100)
+            self.gauge.SetMinSize((500, -1))
 
         self.start = wx.Button(self, -1, "Start Download")
         self.cancel = wx.Button(self, -1, "Cancel Download")
@@ -577,7 +589,11 @@ class audio_firmware_downloader(wx.Dialog):
         self.download_bytes = bytearray(firmware_string)
         self.byte_count = len(self.download_bytes)
         
-        self.gauge.SetLabel("")
+        if any([USE_WINSOUND, USE_WAVER]):
+            self.gauge.SetLabel("")
+        else:
+            self.gauge.SetRange(self.byte_count)
+            self.gauge.SetValue(0)
             
         self.help_text.SetLabel("Creating audio file.")
         self.Update()

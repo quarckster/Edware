@@ -8,3 +8,5 @@ Bill Hammond    -- Firmware programmer and has starting dabbling in the EdWare c
 
 
 Hasso Tepper    -- Contributing GUI fixes and interested in translations.
+Dmitry Misharov -- WASAPI exclusive mode support.
+Kirill Yagin    -- Waver's code.

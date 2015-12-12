@@ -259,7 +259,7 @@ is not sent (it was found that it wasn't needed). So each byte is encoded,
 with a start bit, 8 data bits (LSB first), then a stop bit.
 
 The output is encoded into a 'wav' file, with 2 channels, 8-bit data per channel,
-with a frame rate of 44100 Hz.
+with a frame rate of 44100 or 48000 Hz (according to hardware default sample rate).
 
 The file 'Audio-to-Data-format.pdf' shows an example of how data is encoded.
 
@@ -285,8 +285,26 @@ sequence followed by either N=0 (for the 0-data bit), N=2 (for the 1-data bit) o
 start/stop Mid values). 
 
 Since 1q = 0.5ms, and we are playing the audio at 44.1 frames per 1ms, then 22 frames are recorded
-for each 1q time perioud. 1q isn't exactly 0.5ms (it's a bit fast), but this accuracy is acceptable
-to Edison.
+for each 1q time perioud and 24 frames are recorded in case of 48 kHz sample rate. 1q isn't exactly
+0.5ms (it's a bit fast), but this accuracy is acceptable to Edison.
 
 When EdWare downloads to Edison, it leaves behind the prepared audio file, called 'program.wav', so
 that it can be compared against other implmentations.
+
+Additional notes regarding playing audio files
+
+To avoid distorting sound on Windows EdWare uses WASAPI interface in exclusive mode. It allows
+to feed audio stream directly to hardware bypassing Windows mixer and various branded
+sound enhancements technologies. To play audio file you need to create it with the correct sample rate
+which is supported by the hardware in WASAPI exclusive mode. Pyaudio has ability to get hardware
+properties, but default build has no WASAPI support. A custom build of pyaudio is needed.
+For playing audio file in WASAPI exclusive mode an external player is being used. It's a 
+simple player which can play only wav files in WASAPI exclusive mode. It's based on NAudio
+framework.
+
+Custom build pyaudio under Windows
+Using MinGW
+./configure --with-winapi=wasapi --enable-shared=no
+make
+python setup.py build --static-link -cmingw32
+python setup.py install --skip-build
